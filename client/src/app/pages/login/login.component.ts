@@ -11,7 +11,7 @@ export class LoginComponent {
 
   loginWithGithub() {
     window.location.assign(
-      `https://github.com/login/oauth/authorize?client_id=${this.config.clientId}`
+      `https://github.com/login/oauth/authorize?client_id=${this.config.clientId}&redirect_uri=${this.config.redirectUri}`
     );
   }
 }

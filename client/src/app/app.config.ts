@@ -9,6 +9,7 @@ export interface EnvConfig {
   state: "development" | "production";
   clientId: string;
   clientSecret: string;
+  redirectUri: string;
 }
 export const CONFIG_TOKEN = new InjectionToken<EnvConfig>("configs");
 
