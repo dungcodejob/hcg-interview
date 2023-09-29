@@ -1,10 +1,14 @@
 import { ApplicationConfig, InjectionToken } from "@angular/core";
-import { PreloadAllModules, provideRouter, withPreloading } from "@angular/router";
+import { provideRouter } from "@angular/router";
 
+import { HttpClientModule, provideHttpClient } from "@angular/common/http";
+import { AuthApi } from "./api/auth.api";
 import { routes } from "./app.routers";
 
 export interface EnvConfig {
   state: "development" | "production";
+  clientId: string;
+  clientSecret: string;
 }
 export const CONFIG_TOKEN = new InjectionToken<EnvConfig>("configs");
 
@@ -15,9 +19,11 @@ export const initAppConfig = (config: EnvConfig): ApplicationConfig => {
         provide: CONFIG_TOKEN,
         useValue: config,
       },
+      HttpClientModule,
+      AuthApi,
 
-      provideRouter(routes, withPreloading(PreloadAllModules)),
-
+      provideRouter(routes),
+      provideHttpClient(),
       // provideHttpClient(
       //   withInterceptors([apiPrefixInterceptor, authInterceptor, LoggingInterceptor])
       // ),
