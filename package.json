@@ -1,5 +1,5 @@
 {
-  "name": "hcg-intervew",
+  "name": "hcg-interview",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
@@ -8,7 +8,8 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint": "ng lint",
-    "build:prod": "ng build --configuration production --vendor-chunk=true"
+    "build:prod": "ng build --configuration production --vendor-chunk=true --base-href=https://dungcodejob.github.io/hcg-interview/",
+    "deploy": "ngh --dir=dist/hcg-interview"
   },
   "private": true,
   "dependencies": {
