@@ -1,1 +1,225 @@
-<p>home works!</p>
+<div class="flex w-full justify-end pt-3 pr-6">
+  <div
+    *ngIf="$user() as user"
+    class="flex flex-row items-center  w-fit gap-4 justify-end border border-secondary rounded-l-2xl rounded-r-full">
+    <div class="flex flex-col p-2">
+      <p class="text-sm font-medium">{{ user.login }}</p>
+      <button (click)="onLogout()" class="text-sm cursor-pointer">Logout</button>
+    </div>
+    <img
+      class="w-14 h-14 object-cover rounded-full"
+      [src]="user.avatar_url"
+      alt="user-avatar" />
+  </div>
+</div>
+<div class="flex flex-col items-center mt-6 w-full">
+  <div
+    class="relative max-md:flex-col max-md:px-3 max-w-3xl flex w-full gap-4 justify-center items-center">
+    <mat-form-field class="grow w-full" appearance="fill">
+      <mat-label>Search repositories by name</mat-label>
+      <input
+        matInput
+        [formControl]="searchControl"
+        [matAutocomplete]="auto"
+        (keyup.enter)="onSearch()"
+        type="text" />
+      <mat-icon class="cursor-pointer" (click)="onSearch()" matSuffix>search</mat-icon>
+      <mat-autocomplete #auto="matAutocomplete">
+        <mat-option
+          (click)="onSearch()"
+          *ngFor="let option of $searchHistory()"
+          [value]="option">
+          <p>{{ option }}</p>
+          <mat-icon>history</mat-icon>
+        </mat-option>
+      </mat-autocomplete>
+    </mat-form-field>
+    <button
+      (click)="onToggleAdvancedSearch()"
+      class="flex-none mb-[22px] !h-14"
+      mat-raised-button
+      color="primary">
+      Advanced Search
+    </button>
+  </div>
+  <ng-container *ngIf="$openAdvancedSearch()">
+    <div class="max-md:px-3 w-full flex justify-center">
+      <mat-card class="w-full max-w-3xl" [formGroup]="filterForm">
+        <mat-card-content>
+          <mat-form-field class="w-full">
+            <mat-label>Owner</mat-label>
+            <input matInput formControlName="owner" type="text" />
+          </mat-form-field>
+
+          <ng-container *ngIf="filterBy.language">
+            <div class="flex justify-between">
+              <mat-form-field class="w-full">
+                <mat-label>Programming language</mat-label>
+                <mat-select formControlName="language">
+                  <mat-option>None</mat-option>
+                  <mat-option
+                    *ngFor="let item of $languages(); trackByProperty: 'name'"
+                    [value]="item.name"
+                    >{{ item.name }}</mat-option
+                  >
+                </mat-select>
+              </mat-form-field>
+              <div class="flex justify-center items-start p-4 pt-3">
+                <mat-icon (click)="onRemoveSize()" class="cursor-pointer"
+                  >delete</mat-icon
+                >
+              </div>
+            </div>
+          </ng-container>
+
+          <ng-container *ngIf="filterBy.updatedDate">
+            <div class="w-full flex">
+              <mat-form-field class="w-full">
+                <mat-label>Minium updated date</mat-label>
+                <input formControlName="updatedDate" matInput [matDatepicker]="picker" />
+                <mat-datepicker-toggle
+                  matIconSuffix
+                  [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+              </mat-form-field>
+              <div class="flex justify-center items-start p-4">
+                <mat-icon (click)="onRemoveUpdatedDate()" class="cursor-pointer"
+                  >delete</mat-icon
+                >
+              </div>
+            </div>
+          </ng-container>
+
+          <ng-container *ngIf="filterBy.size">
+            <mat-label>Repositories size</mat-label>
+            <div class="flex justify-between">
+              <div class="w-full flex flex-col px-5">
+                <mat-slider
+                  formGroupName="size"
+                  [min]="SIZE_MIN"
+                  [step]="1000"
+                  [max]="SIZE_MAX">
+                  <input formControlName="min" matSliderStartThumb />
+                  <input formControlName="max" matSliderEndThumb />
+                </mat-slider>
+                <div class="flex justify-between">
+                  <p class="-translate-x-1/3">{{ sizeMin }}</p>
+                  <p class="translate-x-1/3">{{ sizeMax }}</p>
+                </div>
+              </div>
+              <div class="flex justify-center items-start p-4 pt-3">
+                <mat-icon (click)="onRemoveSize()" class="cursor-pointer"
+                  >delete</mat-icon
+                >
+              </div>
+            </div>
+          </ng-container>
+
+          <div
+            *ngIf="!filterBy.size || !filterBy.updatedDate || !filterBy.language"
+            class="mt-3">
+            <button mat-raised-button [matMenuTriggerFor]="menu" color="primary">
+              <mat-icon>add</mat-icon>
+              <p>Add more filter</p>
+            </button>
+          </div>
+
+          <mat-menu #menu="matMenu">
+            <div class="border-b-secondary px-4 py-2 text-center">Select Filter Type</div>
+            <button
+              *ngIf="!filterBy.language"
+              (click)="filterBy.language = true"
+              mat-menu-item>
+              <p>Programming language</p>
+              <mat-icon>add</mat-icon>
+            </button>
+            <button
+              *ngIf="!filterBy.updatedDate"
+              (click)="filterBy.updatedDate = true"
+              mat-menu-item>
+              <p>Minium updated date</p>
+              <mat-icon iconPositionEnd>add</mat-icon>
+            </button>
+            <button *ngIf="!filterBy.size" (click)="filterBy.size = true" mat-menu-item>
+              <p>Repositories size</p>
+              <mat-icon>add</mat-icon>
+            </button>
+          </mat-menu>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </ng-container>
+
+  <div
+    scrollTracker
+    (scrollingFinished)="onScrollingFinished()"
+    class="max-md:px-3 max-md:gap-3 mt-4 flex flex-col items-center w-full max-w-3xl gap-4">
+    <div
+      *ngFor="let item of $items(); trackById"
+      class="p-4 border border-[rgb(208, 215, 222)] w-full rounded-md">
+      <div class="flex gap-2.5">
+        <img class="avatar" [src]="item.owner.avatar_url" alt="github-avatar" />
+        <p class="font-medium">{{ item.full_name }}</p>
+      </div>
+
+      <p class="text-sm mt-1">{{ item.description }}</p>
+      <div class="flex items-center mt-1">
+        <ng-container *ngIf="item.language">
+          <p class="text-xs text-secondary">{{ item.language }}</p>
+          <p class="text-sm px-2 text-secondary">·</p>
+        </ng-container>
+
+        <ng-container *ngIf="item.language">
+          <div class="flex gap-1.5 text-secondary">
+            <svg
+              aria-hidden="true"
+              focusable="false"
+              role="img"
+              class="Octicon-sc-9kayk9-0 dXiFLw"
+              viewBox="0 0 16 16"
+              width="16"
+              height="16"
+              fill="currentColor"
+              style="
+                display: inline-block;
+                user-select: none;
+                vertical-align: text-bottom;
+                overflow: visible;
+              ">
+              <path
+                d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.751.751 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Zm0 2.445L6.615 5.5a.75.75 0 0 1-.564.41l-3.097.45 2.24 2.184a.75.75 0 0 1 .216.664l-.528 3.084 2.769-1.456a.75.75 0 0 1 .698 0l2.77 1.456-.53-3.084a.75.75 0 0 1 .216-.664l2.24-2.183-3.096-.45a.75.75 0 0 1-.564-.41L8 2.694Z"></path>
+            </svg>
+            <p class="text-xs">{{ item.watchers_count_display }}</p>
+          </div>
+          <p class="text-sm px-2 text-secondary">·</p>
+        </ng-container>
+        <p class="text-xs text-secondary">Updated on {{ item.updated_at_display }}</p>
+      </div>
+    </div>
+
+    <ng-container *ngIf="$loading()">
+      <div *repeat="12" class="p-4 border border-[rgb(208, 215, 222)] w-full rounded-md">
+        <div class="flex items-center gap-2.5">
+          <ngx-skeleton-loader count="1" appearance="circle"></ngx-skeleton-loader>
+          <ngx-skeleton-loader class="w-28"></ngx-skeleton-loader>
+        </div>
+        <ngx-skeleton-loader class="flex flex-col" count="1"></ngx-skeleton-loader>
+        <div class="flex gap-4">
+          <ngx-skeleton-loader class="w-full"></ngx-skeleton-loader>
+          <ngx-skeleton-loader class="w-full"></ngx-skeleton-loader>
+          <ngx-skeleton-loader class="w-full"></ngx-skeleton-loader>
+        </div>
+      </div>
+    </ng-container>
+
+    <ng-container *ngIf="$error()">
+      <mat-error>{{ $error() }}</mat-error>
+    </ng-container>
+
+    <ng-container *ngIf="$items().length === 0 && $loading() === false && !$error()">
+      <div class="flex flex-col justify-center items-center">
+        <p class="text-lg font-medium">No repositories found!</p>
+      </div>
+    </ng-container>
+  </div>
+</div>

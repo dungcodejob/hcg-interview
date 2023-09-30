@@ -1,5 +1,5 @@
 import { Component, inject } from "@angular/core";
-import { CONFIG_TOKEN } from "src/app/app.config";
+import { AuthApi } from "src/app/auth/auth.api";
 
 @Component({
   templateUrl: "./login.component.html",
@@ -7,11 +7,9 @@ import { CONFIG_TOKEN } from "src/app/app.config";
   standalone: true,
 })
 export class LoginComponent {
-  config = inject(CONFIG_TOKEN);
+  private readonly _authApi = inject(AuthApi);
 
   loginWithGithub() {
-    window.location.assign(
-      `https://github.com/login/oauth/authorize?client_id=${this.config.clientId}&redirect_uri=${this.config.redirectUri}`
-    );
+    this._authApi.getIdentityUrl().subscribe(res => window.location.assign(res.url));
   }
 }

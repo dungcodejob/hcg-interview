@@ -98,3 +98,6 @@ h6 {
     @apply text-lg;
   }
 }
+
+html, body { height: fit-content; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

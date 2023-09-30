@@ -1,7 +1,6 @@
 {
   "state": "production",
   "logLevel": "debug",
-  "clientId": "ecc6c77bfbbfd29d10c2",
-  "clientSecret": "81af219483216c839b64f82286ddf6627f97cf11",
-  "redirectUri": "https://dungcodejob.github.io/hcg-interview/"
+  "apiUrl": "http://localhost:3000/",
+  "githubUrl": "https://api.github.com/"
 }
